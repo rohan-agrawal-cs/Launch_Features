@@ -112,6 +112,28 @@ const ROUTE_GROUPS: RouteGroup[] = [
     ],
   },
   {
+    title: "Cloud Functions (functions/)",
+    accent: "border-sky-500",
+    routes: [
+      {
+        path: "/cache_priming_cloud",
+        methods: "FUNCTION",
+        description:
+          "Cache-priming target that returns JSON with an explicit s-maxage; `generatedAt` stays put on a cache hit.",
+      },
+      {
+        path: "/hello",
+        methods: "FUNCTION",
+        description: "Echoes back the request body, query and cookies.",
+      },
+      {
+        path: "/user",
+        methods: "FUNCTION",
+        description: "Returns a name plus its short form via functions/utils.js.",
+      },
+    ],
+  },
+  {
     title: "Edge Functions",
     accent: "border-teal-500",
     routes: [
@@ -158,19 +180,21 @@ const ROUTE_GROUPS: RouteGroup[] = [
 ];
 
 /** Kept in sync with `cache.cachePriming.urls` in launch.json. */
-const CACHE_PRIMING_URLS = [
-  "/",
-  "/cache-priming1",
-  "/cache-priming2",
-  "/cache-priming3",
-  "/cache-priming4",
-  "/cache-priming5",
+const CACHE_PRIMING_URLS: { path: string; kind: "page" | "cloud function" }[] = [
+  { path: "/", kind: "page" },
+  { path: "/cache-priming1", kind: "page" },
+  { path: "/cache-priming2", kind: "page" },
+  { path: "/cache-priming3", kind: "page" },
+  { path: "/cache-priming4", kind: "page" },
+  { path: "/cache-priming5", kind: "page" },
+  { path: "/cache_priming_cloud", kind: "cloud function" },
 ];
 
 function methodBadgeClasses(methods: string) {
   if (methods.includes("POST")) return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
   if (methods === "PAGE") return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
   if (methods === "EDGE") return "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200";
+  if (methods === "FUNCTION") return "bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200";
   if (methods === "REDIRECT" || methods === "308") return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
   if (methods === "REWRITE") return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200";
   return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
@@ -254,23 +278,29 @@ export default function Home() {
               one right after a deploy, so the edge is warm before real traffic arrives.
             </p>
             <p className="text-gray-600 dark:text-gray-300 mb-8">
-              Every one of them is statically prerendered, so the first real visitor should
-              get a cache hit instead of a cold render.
+              The pages are statically prerendered, so the first real visitor gets a cache
+              hit instead of a cold render. The cloud function has to opt in itself: it
+              sends <code className="text-sm font-mono">s-maxage</code> so the edge is
+              allowed to store the response, since an uncacheable function would just
+              re-run on every request and gain nothing from priming.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              {CACHE_PRIMING_URLS.map((url) => (
+              {CACHE_PRIMING_URLS.map((entry) => (
                 <a
-                  key={url}
-                  href={url}
+                  key={entry.path}
+                  href={entry.path}
                   className="flex items-center gap-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm hover:border-sky-400 dark:hover:border-sky-500 transition-colors"
                 >
                   <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200">
                     PRIMED
                   </span>
                   <code className="text-sm font-mono text-gray-900 dark:text-gray-100">
-                    {url}
+                    {entry.path}
                   </code>
+                  <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
+                    {entry.kind}
+                  </span>
                 </a>
               ))}
             </div>
