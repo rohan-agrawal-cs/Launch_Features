@@ -84,6 +84,31 @@ const ROUTE_GROUPS: RouteGroup[] = [
         methods: "PAGE",
         description: "UI wrapper that fires per-log requests to /api/log-bulk.",
       },
+      {
+        path: "/cache-priming1",
+        methods: "PAGE",
+        description: "Static cache-priming target #1 (listed in launch.json cachePriming.urls).",
+      },
+      {
+        path: "/cache-priming2",
+        methods: "PAGE",
+        description: "Static cache-priming target #2 (listed in launch.json cachePriming.urls).",
+      },
+      {
+        path: "/cache-priming3",
+        methods: "PAGE",
+        description: "Static cache-priming target #3 (listed in launch.json cachePriming.urls).",
+      },
+      {
+        path: "/cache-priming4",
+        methods: "PAGE",
+        description: "Static cache-priming target #4 (listed in launch.json cachePriming.urls).",
+      },
+      {
+        path: "/cache-priming5",
+        methods: "PAGE",
+        description: "Static cache-priming target #5 (listed in launch.json cachePriming.urls).",
+      },
     ],
   },
   {
@@ -130,6 +155,16 @@ const ROUTE_GROUPS: RouteGroup[] = [
       },
     ],
   },
+];
+
+/** Kept in sync with `cache.cachePriming.urls` in launch.json. */
+const CACHE_PRIMING_URLS = [
+  "/",
+  "/cache-priming1",
+  "/cache-priming2",
+  "/cache-priming3",
+  "/cache-priming4",
+  "/cache-priming5",
 ];
 
 function methodBadgeClasses(methods: string) {
@@ -205,6 +240,48 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </section>
+
+          {/* Cache Priming */}
+          <section className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Cache Priming
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-2">
+              The paths below are listed under{" "}
+              <code className="text-sm font-mono">cache.cachePriming.urls</code> in{" "}
+              <code className="text-sm font-mono">launch.json</code>. Launch requests each
+              one right after a deploy, so the edge is warm before real traffic arrives.
+            </p>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">
+              Every one of them is statically prerendered, so the first real visitor should
+              get a cache hit instead of a cold render.
+            </p>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {CACHE_PRIMING_URLS.map((url) => (
+                <a
+                  key={url}
+                  href={url}
+                  className="flex items-center gap-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm hover:border-sky-400 dark:hover:border-sky-500 transition-colors"
+                >
+                  <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200">
+                    PRIMED
+                  </span>
+                  <code className="text-sm font-mono text-gray-900 dark:text-gray-100">
+                    {url}
+                  </code>
+                </a>
+              ))}
+            </div>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+              Check a primed response with{" "}
+              <code className="font-mono">
+                {"curl -sI https://<your-domain>/cache-priming1"}
+              </code>{" "}
+              and look at the cache/age headers.
+            </p>
           </section>
         </div>
       </main>

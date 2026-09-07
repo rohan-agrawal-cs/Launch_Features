@@ -28,10 +28,11 @@
         "cachePriming": {
             "urls": [
                 "/",
-                "/rewrite",
-                "/rewrite/success",
-                "/new_rewrite",
-                "/log-bulk-requests"
+                "/cache-priming1",
+                "/cache-priming2",
+                "/cache-priming3",
+                "/cache-priming4",
+                "/cache-priming5"
             ]
         }
     }
